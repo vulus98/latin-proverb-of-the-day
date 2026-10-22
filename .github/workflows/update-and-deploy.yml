@@ -17,7 +17,7 @@ jobs:
       - name: Update at 09:00 Europe/Belgrade
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$(TZ=Europe/Belgrade date +%H)" = "09" ]; then
-            if GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}" python scripts/update_proverb.py; then
+            if GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}" FORCE_GENERATE="${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}" python scripts/update_proverb.py; then
               git config user.name "github-actions[bot]"
               git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
               git add data/today.json data/seen.json

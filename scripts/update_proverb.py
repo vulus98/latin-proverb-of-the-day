@@ -74,7 +74,7 @@ def main() -> None:
     seen = json.loads(SEEN.read_text(encoding="utf-8")) if SEEN.exists() else []
     today = now.date().isoformat()
     previous = next((entry for entry in seen if entry["date"] == today), None)
-    if previous:
+    if previous and os.environ.get("FORCE_GENERATE") != "1":
         raise RuntimeError("Today's proverb is already recorded; no update needed")
 
     proverb = request_proverb([entry["latin"] for entry in seen])
