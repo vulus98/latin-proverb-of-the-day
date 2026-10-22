@@ -53,6 +53,9 @@ Markdown, commentary, or extra keys."""
     try:
         with urllib.request.urlopen(request, timeout=60) as response:
             result = json.load(response)
+    except urllib.error.HTTPError as error:
+        detail = error.read().decode("utf-8", errors="replace")[:500]
+        raise RuntimeError(f"Gemini request failed ({error.code}): {detail}") from error
     except (urllib.error.URLError, TimeoutError) as error:
         raise RuntimeError(f"Gemini request failed: {error}") from error
     try:
