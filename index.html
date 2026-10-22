@@ -23,7 +23,7 @@
       <p class="prompt" id="prompt"></p>
     </main>
     <script>
-      fetch("data/today.json")
+      fetch("data/today.json", { cache: "no-store" })
         .then((response) => {
           if (!response.ok) throw new Error("Could not load today's proverb");
           return response.json();
