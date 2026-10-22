@@ -59,6 +59,27 @@ blockquote {
   line-height: 1.6;
 }
 
+.anecdote {
+  margin: 2rem 0 0;
+  padding: 1.3rem 1.4rem;
+  border: 1px solid #e4d8c6;
+  border-radius: 12px;
+  background: #fdf9f1;
+}
+
+.anecdote h2 {
+  margin: 0 0 0.5rem;
+  color: #93672f;
+  font: 700 0.78rem/1.4 system-ui, sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.anecdote p {
+  margin: 0;
+  line-height: 1.6;
+}
+
 .prompt {
   margin: 1.5rem 0 0;
   padding: 1rem 1.2rem;

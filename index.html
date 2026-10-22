@@ -16,6 +16,10 @@
         <p class="translation" id="translation"></p>
       </blockquote>
       <p class="meaning" id="meaning"></p>
+      <section class="anecdote" aria-labelledby="anecdote-title">
+        <h2 id="anecdote-title">A little history</h2>
+        <p id="anecdote"></p>
+      </section>
       <p class="prompt" id="prompt"></p>
       <p class="footer">A new proverb every day at 09:00 Europe/Belgrade.</p>
     </main>
@@ -30,6 +34,7 @@
           document.getElementById("latin").textContent = proverb.latin;
           document.getElementById("translation").textContent = proverb.translation;
           document.getElementById("meaning").textContent = proverb.meaning;
+          document.getElementById("anecdote").textContent = proverb.anecdote;
           document.getElementById("prompt").textContent = proverb.prompt;
           document.title = `${proverb.latin} — Latin Proverb of the Day`;
         })

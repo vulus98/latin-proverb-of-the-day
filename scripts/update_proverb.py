@@ -23,6 +23,7 @@ def main() -> None:
         "latin": proverb["latin"],
         "translation": proverb["translation"],
         "meaning": proverb["meaning"],
+        "anecdote": proverb["anecdote"],
         "prompt": proverb["prompt"],
     }
     TODAY.write_text(json.dumps(output, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
