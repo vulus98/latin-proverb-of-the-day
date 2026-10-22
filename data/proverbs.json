@@ -1,0 +1,62 @@
+[
+  {
+    "latin": "Carpe diem",
+    "translation": "Seize the day.",
+    "meaning": "Make good use of the present rather than waiting for an uncertain future.",
+    "prompt": "What is one small thing you can enjoy or accomplish today?"
+  },
+  {
+    "latin": "Amor vincit omnia",
+    "translation": "Love conquers all.",
+    "meaning": "Love can overcome obstacles and hardship.",
+    "prompt": "What kind act could make today better for someone you love?"
+  },
+  {
+    "latin": "Per aspera ad astra",
+    "translation": "Through hardships to the stars.",
+    "meaning": "Difficult paths can lead to great achievements.",
+    "prompt": "Which challenge are you willing to take one step closer to overcoming?"
+  },
+  {
+    "latin": "Fortuna audaces iuvat",
+    "translation": "Fortune favors the bold.",
+    "meaning": "Courageous action often creates opportunities.",
+    "prompt": "What brave but sensible action could you take today?"
+  },
+  {
+    "latin": "Festina lente",
+    "translation": "Make haste slowly.",
+    "meaning": "Move with purpose, but do not sacrifice care for speed.",
+    "prompt": "Where would slowing down help you do something better?"
+  },
+  {
+    "latin": "Dum spiro, spero",
+    "translation": "While I breathe, I hope.",
+    "meaning": "As long as life continues, hope remains possible.",
+    "prompt": "What possibility do you still want to leave room for?"
+  },
+  {
+    "latin": "Errare humanum est",
+    "translation": "To err is human.",
+    "meaning": "Mistakes are a natural part of being human; what matters is learning from them.",
+    "prompt": "What mistake can you forgive yourself or someone else for?"
+  },
+  {
+    "latin": "Mens sana in corpore sano",
+    "translation": "A sound mind in a sound body.",
+    "meaning": "Well-being is supported by caring for both mental and physical health.",
+    "prompt": "What would nurture your mind and body today?"
+  },
+  {
+    "latin": "Ubi concordia, ibi victoria",
+    "translation": "Where there is unity, there is victory.",
+    "meaning": "Cooperation and shared purpose make difficult goals achievable.",
+    "prompt": "What can you and your girlfriend tackle as a team today?"
+  },
+  {
+    "latin": "Verba volant, scripta manent",
+    "translation": "Spoken words fly away; written words remain.",
+    "meaning": "Writing preserves commitments, ideas, and memories.",
+    "prompt": "What meaningful thought could you write down today?"
+  }
+]

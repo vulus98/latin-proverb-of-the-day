@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A Latin proverb to learn together every day.">
+    <title>Latin Proverb of the Day</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <main class="card">
+      <p class="eyebrow">Latin proverb of the day</p>
+      <p class="date" id="date">Loading…</p>
+      <blockquote>
+        <p class="latin" id="latin">Loading…</p>
+        <p class="translation" id="translation"></p>
+      </blockquote>
+      <p class="meaning" id="meaning"></p>
+      <p class="prompt" id="prompt"></p>
+      <p class="footer">A new proverb every day at 09:00 Europe/Belgrade.</p>
+    </main>
+    <script>
+      fetch("data/today.json")
+        .then((response) => {
+          if (!response.ok) throw new Error("Could not load today's proverb");
+          return response.json();
+        })
+        .then((proverb) => {
+          document.getElementById("date").textContent = proverb.date;
+          document.getElementById("latin").textContent = proverb.latin;
+          document.getElementById("translation").textContent = proverb.translation;
+          document.getElementById("meaning").textContent = proverb.meaning;
+          document.getElementById("prompt").textContent = proverb.prompt;
+          document.title = `${proverb.latin} — Latin Proverb of the Day`;
+        })
+        .catch((error) => {
+          document.getElementById("latin").textContent = "Unable to load today's proverb.";
+          console.error(error);
+        });
+    </script>
+  </body>
+</html>
