@@ -20,7 +20,10 @@
         <h2 id="anecdote-title">A little history</h2>
         <p id="anecdote"></p>
       </section>
-      <p class="prompt" id="prompt"></p>
+      <section class="reflection" aria-labelledby="reflection-title">
+        <h2 id="reflection-title">Question to ponder</h2>
+        <p class="prompt" id="prompt"></p>
+      </section>
     </main>
     <script>
       fetch("data/today.json", { cache: "no-store" })
