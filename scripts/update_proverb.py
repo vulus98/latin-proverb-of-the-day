@@ -14,7 +14,7 @@ from zoneinfo import ZoneInfo
 ROOT = Path(__file__).resolve().parents[1]
 TODAY = ROOT / "data" / "today.json"
 SEEN = ROOT / "data" / "seen.json"
-MODEL = "gemini-2.0-flash"
+MODEL = "gemini-3.8-flash"
 FIELDS = ("latin", "translation", "meaning", "anecdote", "prompt")
 
 
