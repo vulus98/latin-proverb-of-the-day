@@ -101,7 +101,9 @@ Markdown, commentary, or extra keys."""
         isinstance(proverb[field], str) and proverb[field].strip() for field in FIELDS
     ):
         raise RuntimeError("Gemini response did not contain the required fields")
-    proverb["prompt"] = proverb["prompt"].removeprefix("Question to ponder:").strip()
+    prompt_prefix = "question to ponder:"
+    if proverb["prompt"].casefold().startswith(prompt_prefix):
+        proverb["prompt"] = proverb["prompt"][len(prompt_prefix):].strip()
     if proverb["latin"].strip().casefold() in {item.casefold() for item in seen_latin}:
         raise RuntimeError("Gemini returned a previously used proverb")
     return proverb
