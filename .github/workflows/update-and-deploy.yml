@@ -8,6 +8,11 @@ on:
         required: false
         default: false
         type: boolean
+      send_test:
+        description: "Send the current proverb reminder to my test number"
+        required: false
+        default: false
+        type: boolean
   schedule:
     # Run hourly so the check remains at 09:00 in Europe/Belgrade across DST.
     - cron: "0 * * * *"
@@ -69,7 +74,7 @@ jobs:
             fi
           fi
       - name: Send WhatsApp reminder
-        if: steps.publish.outputs.updated == 'true' && github.event_name == 'schedule'
+        if: (steps.publish.outputs.updated == 'true' && github.event_name == 'schedule') || (inputs.send_test == true)
         env:
           WHATSAPP_PHONE_NUMBER_ID: ${{ secrets.WHATSAPP_PHONE_NUMBER_ID }}
           WHATSAPP_ACCESS_TOKEN: ${{ secrets.WHATSAPP_ACCESS_TOKEN }}
@@ -81,12 +86,16 @@ jobs:
           PY
           )"
           link="https://vulus98.github.io/latin-proverb-of-the-day/"
-          payload="$(python - "$teaser" "$link" <<'PY'
+          recipient="+381605119995"
+          if [ "${{ inputs.send_test }}" = "true" ]; then
+            recipient="+381638991909"
+          fi
+          payload="$(python - "$teaser" "$link" "$recipient" <<'PY'
           import json
           import sys
           print(json.dumps({
               "messaging_product": "whatsapp",
-              "to": "+381605119995",
+              "to": sys.argv[3],
               "type": "template",
               "template": {
                   "name": "latin_proverb_update",
