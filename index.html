@@ -17,10 +17,10 @@
       <h2>How does the page feel?</h2>
       <p>Choose the compliment that best describes your experience.</p>
       <div class="feedback-options" id="feedback-options">
-        <button type="button" data-reply="Excellent taste. Clearly, your standards are flourishing.">Surprisingly delightful</button>
-        <button type="button" data-reply="A wise choice. The ancient Romans would have applauded politely.">Wisely curated</button>
-        <button type="button" data-reply="Your enthusiasm has been added to today's historical record.">Makes me think</button>
-        <button type="button" data-reply="A compliment from you? We shall treasure it forever.">Cute and clever</button>
+        <button type="button" data-feedback="delightful">Surprisingly delightful</button>
+        <button type="button" data-feedback="wise">Wisely curated</button>
+        <button type="button" data-feedback="thoughtful">Makes me think</button>
+        <button type="button" data-feedback="cute">Cute and clever</button>
       </div>
       <button class="honest-feedback" id="honest-feedback" type="button">Not my thing</button>
       <p class="feedback-reply" id="feedback-reply" role="status"></p>
@@ -75,9 +75,100 @@
 
         feedbackToggle.addEventListener("click", () => setFeedbackOpen(true));
         feedbackClose.addEventListener("click", () => setFeedbackOpen(false));
+        const feedbackReplies = {
+          delightful: [
+            "Excellent taste. Clearly, your standards are flourishing.",
+            "A delightful verdict from a delightful person.",
+            "Your joy has been carefully noted by the tiny review council.",
+            "We knew the Latin would win you over eventually.",
+            "That is almost as lovely as you are.",
+            "Your smile just earned honorary Roman citizenship.",
+            "A glowing review! The parchment is already being prepared.",
+            "You have excellent instincts and suspiciously good taste.",
+            "This page is blushing. You may have to give it a moment.",
+            "Your approval has made the ancient scrolls sparkle.",
+            "Delight detected. We recommend celebrating with a small snack.",
+            "The proverb has officially found its favorite reader.",
+            "Your enthusiasm is more radiant than a freshly polished laurel wreath.",
+            "This is the sort of feedback that makes websites stand taller.",
+            "A charming opinion from an even more charming critic.",
+            "The muses have reviewed your review and given it five stars.",
+            "You have made a humble webpage feel extremely fancy.",
+            "That compliment has been framed and hung in the virtual hallway.",
+            "Your excellent taste remains undefeated.",
+            "The page would like to thank you personally, but it has no hands."
+          ],
+          wise: [
+            "A wise choice. The ancient Romans would have applauded politely.",
+            "Your judgment is sound. Seneca would probably nod.",
+            "Wisdom recognized wisdom. Very efficient.",
+            "You have chosen with the confidence of a philosopher-king.",
+            "That was a discerning click, worthy of its own footnote.",
+            "Your inner sage is clearly having a productive morning.",
+            "The Oracle of Delphi has been informed of your excellent judgment.",
+            "A thoughtful verdict from someone who clearly reads beyond the headline.",
+            "You clicked wisely, which is more than most emperors managed.",
+            "Your discernment has been entered into the public record.",
+            "That choice has the quiet dignity of a well-placed semicolon.",
+            "The council agrees: your judgment is remarkably well seasoned.",
+            "You have selected the option with maximum philosophical credibility.",
+            "A wise response. Somewhere, a toga has been adjusted approvingly.",
+            "Your standards are high, your judgment is higher.",
+            "This decision would pass even the strictest Roman jury.",
+            "You have the rare gift of recognizing quality without making a speech.",
+            "Prudent, elegant, and entirely correct. Naturally.",
+            "A sound decision, made by a sound mind.",
+            "Your wisdom has briefly improved the average intelligence of the internet."
+          ],
+          thoughtful: [
+            "Your enthusiasm has been added to today's historical record.",
+            "A thoughtful reader! The proverb has found fertile ground.",
+            "You have given the question exactly the attention it was hoping for.",
+            "Your mind is clearly wandering in interesting directions.",
+            "That is the click of someone who notices the small things.",
+            "The philosophers approve of your excellent use of curiosity.",
+            "You have turned a tiny proverb into a proper conversation.",
+            "Your reflection has made this webpage feel unexpectedly profound.",
+            "A beautiful choice from someone with a beautifully busy mind.",
+            "The question is now wearing a little thinking cap.",
+            "You have given the ancient words a modern audience and a good one.",
+            "Your curiosity is doing excellent work today.",
+            "That answer suggests there is a whole essay hiding in your head.",
+            "The page is pleased to have provoked a thought rather than a yawn.",
+            "You are proof that old words can still find new minds.",
+            "A reflective click. Plato would have asked a follow-up question.",
+            "Your attention has made the proverb feel important again.",
+            "The thoughtfulness here is frankly showing off.",
+            "You have found the question inside the question. Very impressive.",
+            "A deep thinker has entered the feedback panel. Everyone remain calm."
+          ],
+          cute: [
+            "A compliment from you? We shall treasure it forever.",
+            "Cute and clever recognizes cute and clever.",
+            "That is an adorable assessment from an adorable scholar.",
+            "The page has just developed a tiny crush on your feedback.",
+            "You make even ancient Latin feel warm and cozy.",
+            "The Roman doves have delivered your compliment safely.",
+            "That was sweet. The scrolls are blushing.",
+            "A charming click from a charming person. Statistically inevitable.",
+            "Your feedback is cuter than a kitten in a tiny laurel wreath.",
+            "The page would send you flowers, if CSS had a florist.",
+            "That compliment has been wrapped in ribbon and stored carefully.",
+            "You are making classical education dangerously adorable.",
+            "A lovely choice from our favorite modern Roman.",
+            "The feedback panel has officially become the cutest part of the site.",
+            "You brought a little sunshine to a page full of old words.",
+            "That was so sweet, even the sternest Latin teacher smiled.",
+            "Your charm has been noted in elegant handwriting.",
+            "A precious review from a precious reader.",
+            "The page is now fluffing its metaphorical feathers.",
+            "You have made this tiny corner of the internet very happy."
+          ]
+        };
         document.querySelectorAll("#feedback-options button").forEach((option) => {
           option.addEventListener("click", () => {
-            feedbackReply.textContent = option.dataset.reply;
+            const replies = feedbackReplies[option.dataset.feedback];
+            feedbackReply.textContent = replies[Math.floor(Math.random() * replies.length)];
           });
         });
         document.getElementById("honest-feedback").addEventListener("click", () => {
