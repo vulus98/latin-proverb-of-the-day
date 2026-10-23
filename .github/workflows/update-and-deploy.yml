@@ -23,7 +23,15 @@ jobs:
       - name: Update at 09:00 Europe/Belgrade
         id: publish
         run: |
-          if [ "${{ github.event_name }}" = "schedule" ] && { [ "$(TZ=Europe/Belgrade date +%u)" != "2" ] && [ "$(TZ=Europe/Belgrade date +%u)" != "6" ]; || [ "$(TZ=Europe/Belgrade date +%H)" != "09" ]; }; then
+          local_day="$(TZ=Europe/Belgrade date +%u)"
+          local_hour="$(TZ=Europe/Belgrade date +%H)"
+          schedule_window=false
+          if [ "$local_day" = "2" ] || [ "$local_day" = "6" ]; then
+            if [ "$local_hour" = "09" ]; then
+              schedule_window=true
+            fi
+          fi
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "$schedule_window" = "false" ]; then
             echo "Not Tuesday or Saturday at 09:00 Europe/Belgrade; no update needed."
             echo "updated=false" >> "$GITHUB_OUTPUT"
           else
