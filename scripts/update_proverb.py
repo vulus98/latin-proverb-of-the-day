@@ -21,6 +21,10 @@ class RetryableGeminiError(RuntimeError):
     """A temporary Gemini or network failure that is safe to retry."""
 
 
+class UnavailableGeminiModelError(RetryableGeminiError):
+    """A listed model cannot be used and should be replaced."""
+
+
 def api_request(api_key: str, path: str) -> dict:
     request = urllib.request.Request(
         f"https://generativelanguage.googleapis.com/v1beta/{path}?key={urllib.parse.quote(api_key)}",
@@ -37,17 +41,29 @@ def api_request(api_key: str, path: str) -> dict:
         raise RetryableGeminiError(f"Gemini request failed: {error}") from error
 
 
-def available_model(api_key: str) -> str:
+def available_models(api_key: str) -> list[str]:
     models = api_request(api_key, "models").get("models", [])
     candidates = [
         model for model in models
-        if "generateContent" in model.get("supportedGenerationMethods", [])
+        if model.get("name", "").startswith("models/")
+        and "generateContent" in model.get("supportedGenerationMethods", [])
         and "flash" in model.get("name", "").casefold()
     ]
     if not candidates:
         raise RuntimeError("Gemini API returned no available flash generation model")
-    candidates.sort(key=lambda model: ("lite" not in model["name"].casefold(), model["name"]))
-    return candidates[0]["name"].removeprefix("models/")
+    def model_priority(model: dict) -> tuple[int, int, str]:
+        name = model["name"].casefold()
+        # Prefer newer stable Flash models, then non-lite models. The API can
+        # retain legacy entries in /models after generation access is removed.
+        version = 0
+        for prefix in ("gemini-3.", "gemini-2.5", "gemini-2.0", "gemini-1.5"):
+            if prefix in name:
+                version = {"gemini-3.": 4, "gemini-2.5": 3, "gemini-2.0": 2, "gemini-1.5": 1}[prefix]
+                break
+        return (-version, "lite" in name, name)
+
+    candidates.sort(key=model_priority)
+    return [model["name"].removeprefix("models/") for model in candidates]
 
 
 def request_proverb(seen_latin: list[str]) -> dict[str, str]:
@@ -72,26 +88,37 @@ Markdown, commentary, or extra keys."""
             "temperature": 0.8,
         },
     }
-    model = available_model(api_key)
-    url = (
-        f"https://generativelanguage.googleapis.com/v1beta/models/{model}:"
-        f"generateContent?key={urllib.parse.quote(api_key)}"
-    )
-    request = urllib.request.Request(
-        url,
-        data=json.dumps(body).encode("utf-8"),
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-    try:
-        with urllib.request.urlopen(request, timeout=60) as response:
-            result = json.load(response)
-    except urllib.error.HTTPError as error:
-        detail = error.read().decode("utf-8", errors="replace")[:500]
-        error_type = RetryableGeminiError if error.code in (408, 429, 500, 502, 503, 504) else RuntimeError
-        raise error_type(f"Gemini request failed ({error.code}): {detail}") from error
-    except (urllib.error.URLError, TimeoutError) as error:
-        raise RetryableGeminiError(f"Gemini request failed: {error}") from error
+    result = None
+    model_errors = []
+    for model in available_models(api_key):
+        url = (
+            f"https://generativelanguage.googleapis.com/v1beta/models/{model}:"
+            f"generateContent?key={urllib.parse.quote(api_key)}"
+        )
+        request = urllib.request.Request(
+            url,
+            data=json.dumps(body).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=60) as response:
+                result = json.load(response)
+            print(f"Gemini model selected: {model}")
+            break
+        except urllib.error.HTTPError as error:
+            detail = error.read().decode("utf-8", errors="replace")[:500]
+            if error.code == 404:
+                model_errors.append(f"{model}: {detail}")
+                print(f"Gemini model unavailable, trying the next candidate: {model}")
+                continue
+            error_type = RetryableGeminiError if error.code in (408, 429, 500, 502, 503, 504) else RuntimeError
+            raise error_type(f"Gemini request failed ({error.code}): {detail}") from error
+        except (urllib.error.URLError, TimeoutError) as error:
+            raise RetryableGeminiError(f"Gemini request failed: {error}") from error
+    if result is None:
+        detail = "; ".join(model_errors)
+        raise UnavailableGeminiModelError(f"No listed Gemini model was usable: {detail}")
     try:
         text = result["candidates"][0]["content"]["parts"][0]["text"]
         proverb = json.loads(text)
