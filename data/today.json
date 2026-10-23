@@ -1,8 +1,8 @@
 {
   "date": "Friday, 23 October 2026",
-  "latin": "Audentes Fortuna iuvat",
-  "translation": "Fortune favors the brave",
-  "meaning": "Success is more likely to come to those who take bold risks and act with courage rather than remaining overly cautious.",
-  "anecdote": "The earliest surviving appearance of this sentiment is in a fragment of Ennius's epic poem the Annals, though the exact modern phrasing is most famously found in Virgil's Aeneid (Book X, line 284), where it is spoken by Turnus as he leaps into battle. Pliny the Younger also records that his uncle, Pliny the Elder, used a variation of this phrase—'Audentes fortuna iuvat'—to encourage his ship's helmsman to press on toward Stabiae during the catastrophic eruption of Mount Vesuvius in 79 AD.",
-  "prompt": "When does calculated risk cross the boundary into reckless endangerment, and how do we measure the courage required to take that leap?"
+  "latin": "Sic transit gloria mundi",
+  "translation": "Thus passes the glory of the world",
+  "meaning": "Worldly ambitions, fame, and temporal power are fleeting and ultimately insignificant.",
+  "anecdote": "This phrase was historically used in the coronation ritual of the Pope. As the newly elected pontiff processed toward St. Peter's Basilica, a master of ceremonies would halt the procession three times, ignite a small piece of tow attached to a reed, and chant the phrase to remind the Pope of his mortality and the transient nature of earthly power.",
+  "prompt": "If all temporal achievements eventually fade into obscurity, what enduring value do our daily pursuits hold?"
 }
