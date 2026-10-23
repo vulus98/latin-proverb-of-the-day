@@ -87,7 +87,14 @@ def main() -> None:
     previous = json.loads(STATE.read_text(encoding="utf-8")) if STATE.exists() else {}
     if previous.get("sent") == marker:
         return
-    send_message("A new Latin proverb is out.")
+    teaser = entry["meaning"].strip()
+    if len(teaser) > 130:
+        teaser = teaser[:127].rsplit(" ", 1)[0] + "..."
+    send_message(
+        "✨ A new Latin proverb is here!\n"
+        f"Today's thought: {teaser}\n"
+        "Tap below to discover it."
+    )
     STATE.parent.mkdir(parents=True, exist_ok=True)
     STATE.write_text(json.dumps({"sent": marker}, indent=2) + "\n", encoding="utf-8")
 
