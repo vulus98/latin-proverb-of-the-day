@@ -93,7 +93,7 @@ def main() -> None:
     send_message(
         "✨ A new Latin proverb is here!\n"
         f"Today's thought: {teaser}\n"
-        "Tap below to discover it."
+        f"Read it here: {SITE}"
     )
     STATE.parent.mkdir(parents=True, exist_ok=True)
     STATE.write_text(json.dumps({"sent": marker}, indent=2) + "\n", encoding="utf-8")
