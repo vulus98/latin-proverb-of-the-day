@@ -8,6 +8,23 @@
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
+    <button class="feedback-tab" id="feedback-toggle" type="button" aria-expanded="false" aria-controls="feedback-panel">
+      Leave feedback
+    </button>
+    <aside class="feedback-panel" id="feedback-panel" aria-hidden="true">
+      <button class="feedback-close" id="feedback-close" type="button" aria-label="Close feedback">×</button>
+      <p class="eyebrow">A tiny review council</p>
+      <h2>How does the page feel?</h2>
+      <p>Choose the compliment that best describes your experience.</p>
+      <div class="feedback-options" id="feedback-options">
+        <button type="button" data-reply="Excellent taste. Clearly, your standards are flourishing.">Surprisingly delightful</button>
+        <button type="button" data-reply="A wise choice. The ancient Romans would have applauded politely.">Wisely curated</button>
+        <button type="button" data-reply="Your enthusiasm has been added to today's historical record.">Makes me think</button>
+        <button type="button" data-reply="A compliment from you? We shall treasure it forever.">Cute and clever</button>
+      </div>
+      <button class="honest-feedback" id="honest-feedback" type="button">Not my thing</button>
+      <p class="feedback-reply" id="feedback-reply" role="status"></p>
+    </aside>
     <main class="card">
       <p class="eyebrow">Latin proverb of the day</p>
       <p class="date" id="date">Loading…</p>
@@ -43,6 +60,28 @@
         .catch((error) => {
           document.getElementById("latin").textContent = "Unable to load today's proverb.";
           console.error(error);
+        });
+
+        const feedbackToggle = document.getElementById("feedback-toggle");
+        const feedbackClose = document.getElementById("feedback-close");
+        const feedbackPanel = document.getElementById("feedback-panel");
+        const feedbackReply = document.getElementById("feedback-reply");
+        const setFeedbackOpen = (isOpen) => {
+          feedbackToggle.setAttribute("aria-expanded", String(isOpen));
+          feedbackPanel.setAttribute("aria-hidden", String(!isOpen));
+          feedbackPanel.classList.toggle("is-open", isOpen);
+          if (isOpen) feedbackPanel.querySelector("button").focus();
+        };
+
+        feedbackToggle.addEventListener("click", () => setFeedbackOpen(true));
+        feedbackClose.addEventListener("click", () => setFeedbackOpen(false));
+        document.querySelectorAll("#feedback-options button").forEach((option) => {
+          option.addEventListener("click", () => {
+            feedbackReply.textContent = option.dataset.reply;
+          });
+        });
+        document.getElementById("honest-feedback").addEventListener("click", () => {
+          feedbackReply.textContent = "Fair enough. Even Cicero had critics.";
         });
     </script>
   </body>
