@@ -165,6 +165,28 @@
             "You have made this tiny corner of the internet very happy."
           ]
         };
+        const honestReplies = [
+          "Fair enough. Even Cicero had critics.",
+          "Not every proverb can be your proverb. The search continues.",
+          "A respectable verdict. The page will reflect on it dramatically.",
+          "Thank you for the honest review. No scrolls were harmed.",
+          "Understood. We shall put this proverb in the reconsideration pile.",
+          "The ancient review council accepts your ruling.",
+          "That is fair. Even the Romans did not agree on everything.",
+          "Noted with dignity, humility, and a tiny ceremonial bow.",
+          "Your honesty has been received and carefully filed under ‘useful.’",
+          "No offense taken. The page has a surprisingly resilient ego.",
+          "A wise website listens to its readers. This one is listening.",
+          "Perhaps a different proverb will win you over tomorrow.",
+          "The muses have requested more specific feedback, but they understand.",
+          "A perfectly valid opinion. Your standards remain safely intact.",
+          "The page will now stare thoughtfully out of an imaginary window.",
+          "Thank you for sparing us a five-paragraph diplomatic complaint.",
+          "Even the best ideas occasionally meet a raised eyebrow.",
+          "Your verdict is entered into the annals of honest criticism.",
+          "We shall regroup, consult the classics, and try again.",
+          "Fair enough. The next proverb has been warned."
+        ];
         document.querySelectorAll("#feedback-options button").forEach((option) => {
           option.addEventListener("click", () => {
             const replies = feedbackReplies[option.dataset.feedback];
@@ -172,7 +194,7 @@
           });
         });
         document.getElementById("honest-feedback").addEventListener("click", () => {
-          feedbackReply.textContent = "Fair enough. Even Cicero had critics.";
+          feedbackReply.textContent = honestReplies[Math.floor(Math.random() * honestReplies.length)];
         });
     </script>
   </body>
