@@ -1,8 +1,8 @@
 {
   "date": "Friday, 23 October 2026",
-  "latin": "Festina lente",
-  "translation": "Make haste slowly",
-  "meaning": "True efficiency requires a balance between swift action and deliberate caution, as rushing risks fatal mistakes while hesitation yields stagnation.",
-  "anecdote": "The Roman biographer Suetonius recorded in 'The Twelve Caesars' that the Greek equivalent of this maxim, 'Speude bradeos', was frequently quoted by Emperor Augustus. Augustus considered rashness and excessive haste to be among the most dangerous faults in a leader and military commander. The proverb later became famous in Renaissance Europe when the Venetian printer Aldus Manutius adopted it as his personal motto, accompanied by the famous emblem of a dolphin wrapped around an anchor.",
-  "prompt": "In which areas of your life are you mistaking frantic velocity for genuine progress?"
+  "latin": "Errare humanum est",
+  "translation": "To err is human",
+  "meaning": "Making mistakes is a natural part of human nature and something everyone does.",
+  "anecdote": "While often attributed to Seneca the Younger, the exact phrasing does not appear in his surviving works in this exact form. Similar sentiments are found in classical authors like Cicero and later Christian writers, including Saint Jerome, but the modern formulation crystallized over centuries of use in European literature and legal traditions.",
+  "prompt": "How does our capacity for error shape our capacity for empathy and growth?"
 }
