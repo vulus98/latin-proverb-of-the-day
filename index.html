@@ -15,15 +15,19 @@
       <button class="feedback-close" id="feedback-close" type="button" aria-label="Close feedback">×</button>
       <p class="eyebrow">A tiny review council</p>
       <h2>How does the page feel?</h2>
-      <p>Choose the compliment that best describes your experience.</p>
+      <p>Cast your verdict. The council will answer.</p>
       <div class="feedback-options" id="feedback-options">
-        <button type="button" data-feedback="delightful">Surprisingly delightful</button>
-        <button type="button" data-feedback="wise">Wisely curated</button>
-        <button type="button" data-feedback="thoughtful">Makes me think</button>
-        <button type="button" data-feedback="cute">Cute and clever</button>
+        <button type="button" data-feedback="delightful"><span aria-hidden="true">✨</span> Surprisingly delightful</button>
+        <button type="button" data-feedback="wise"><span aria-hidden="true">🏛️</span> Wisely curated</button>
+        <button type="button" data-feedback="thoughtful"><span aria-hidden="true">🪶</span> Makes me think</button>
+        <button type="button" data-feedback="cute"><span aria-hidden="true">🌿</span> Cute and clever</button>
       </div>
       <button class="honest-feedback" id="honest-feedback" type="button">Not my thing</button>
-      <p class="feedback-reply" id="feedback-reply" role="status"></p>
+      <div class="feedback-result" id="feedback-result" aria-live="polite" hidden>
+        <p class="feedback-verdict" id="feedback-verdict"></p>
+        <p class="feedback-reply" id="feedback-reply"></p>
+        <button class="feedback-again" id="feedback-again" type="button">Cast another verdict</button>
+      </div>
     </aside>
     <main class="card">
       <p class="eyebrow">Latin proverb of the day</p>
@@ -65,6 +69,10 @@
         const feedbackToggle = document.getElementById("feedback-toggle");
         const feedbackClose = document.getElementById("feedback-close");
         const feedbackPanel = document.getElementById("feedback-panel");
+        const feedbackOptions = document.getElementById("feedback-options");
+        const honestFeedback = document.getElementById("honest-feedback");
+        const feedbackResult = document.getElementById("feedback-result");
+        const feedbackVerdict = document.getElementById("feedback-verdict");
         const feedbackReply = document.getElementById("feedback-reply");
         const setFeedbackOpen = (isOpen) => {
           feedbackToggle.setAttribute("aria-expanded", String(isOpen));
@@ -75,6 +83,21 @@
 
         feedbackToggle.addEventListener("click", () => setFeedbackOpen(true));
         feedbackClose.addEventListener("click", () => setFeedbackOpen(false));
+        const showReply = (label, replies) => {
+          feedbackVerdict.textContent = `The council hears: “${label}”`;
+          feedbackReply.textContent = replies[Math.floor(Math.random() * replies.length)];
+          feedbackOptions.hidden = true;
+          honestFeedback.hidden = true;
+          feedbackResult.hidden = false;
+          feedbackResult.classList.remove("feedback-result-pop");
+          void feedbackResult.offsetWidth;
+          feedbackResult.classList.add("feedback-result-pop");
+        };
+        const resetFeedback = () => {
+          feedbackOptions.hidden = false;
+          honestFeedback.hidden = false;
+          feedbackResult.hidden = true;
+        };
         const feedbackReplies = {
           delightful: [
             "Excellent taste. Clearly, your standards are flourishing.",
@@ -190,12 +213,13 @@
         document.querySelectorAll("#feedback-options button").forEach((option) => {
           option.addEventListener("click", () => {
             const replies = feedbackReplies[option.dataset.feedback];
-            feedbackReply.textContent = replies[Math.floor(Math.random() * replies.length)];
+            showReply(option.textContent.trim(), replies);
           });
         });
-        document.getElementById("honest-feedback").addEventListener("click", () => {
-          feedbackReply.textContent = honestReplies[Math.floor(Math.random() * honestReplies.length)];
+        honestFeedback.addEventListener("click", () => {
+          showReply(honestFeedback.textContent, honestReplies);
         });
+        document.getElementById("feedback-again").addEventListener("click", resetFeedback);
     </script>
   </body>
 </html>
