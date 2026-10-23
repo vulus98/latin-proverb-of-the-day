@@ -17,6 +17,10 @@ SEEN = ROOT / "data" / "seen.json"
 FIELDS = ("latin", "translation", "meaning", "anecdote", "prompt")
 
 
+class RetryableGeminiError(RuntimeError):
+    """A temporary Gemini or network failure that is safe to retry."""
+
+
 def api_request(api_key: str, path: str) -> dict:
     request = urllib.request.Request(
         f"https://generativelanguage.googleapis.com/v1beta/{path}?key={urllib.parse.quote(api_key)}",
@@ -27,9 +31,10 @@ def api_request(api_key: str, path: str) -> dict:
             return json.load(response)
     except urllib.error.HTTPError as error:
         detail = error.read().decode("utf-8", errors="replace")[:500]
-        raise RuntimeError(f"Gemini request failed ({error.code}): {detail}") from error
+        error_type = RetryableGeminiError if error.code in (408, 429, 500, 502, 503, 504) else RuntimeError
+        raise error_type(f"Gemini request failed ({error.code}): {detail}") from error
     except (urllib.error.URLError, TimeoutError) as error:
-        raise RuntimeError(f"Gemini request failed: {error}") from error
+        raise RetryableGeminiError(f"Gemini request failed: {error}") from error
 
 
 def available_model(api_key: str) -> str:
@@ -83,9 +88,10 @@ Markdown, commentary, or extra keys."""
             result = json.load(response)
     except urllib.error.HTTPError as error:
         detail = error.read().decode("utf-8", errors="replace")[:500]
-        raise RuntimeError(f"Gemini request failed ({error.code}): {detail}") from error
+        error_type = RetryableGeminiError if error.code in (408, 429, 500, 502, 503, 504) else RuntimeError
+        raise error_type(f"Gemini request failed ({error.code}): {detail}") from error
     except (urllib.error.URLError, TimeoutError) as error:
-        raise RuntimeError(f"Gemini request failed: {error}") from error
+        raise RetryableGeminiError(f"Gemini request failed: {error}") from error
     try:
         text = result["candidates"][0]["content"]["parts"][0]["text"]
         proverb = json.loads(text)
@@ -120,4 +126,8 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except RetryableGeminiError as error:
+        print(f"Retryable error: {error}")
+        raise SystemExit(75) from error
