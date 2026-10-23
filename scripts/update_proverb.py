@@ -14,8 +14,35 @@ from zoneinfo import ZoneInfo
 ROOT = Path(__file__).resolve().parents[1]
 TODAY = ROOT / "data" / "today.json"
 SEEN = ROOT / "data" / "seen.json"
-MODEL = "gemini-3.8-flash"
 FIELDS = ("latin", "translation", "meaning", "anecdote", "prompt")
+
+
+def api_request(api_key: str, path: str) -> dict:
+    request = urllib.request.Request(
+        f"https://generativelanguage.googleapis.com/v1beta/{path}?key={urllib.parse.quote(api_key)}",
+        headers={"Content-Type": "application/json"},
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=60) as response:
+            return json.load(response)
+    except urllib.error.HTTPError as error:
+        detail = error.read().decode("utf-8", errors="replace")[:500]
+        raise RuntimeError(f"Gemini request failed ({error.code}): {detail}") from error
+    except (urllib.error.URLError, TimeoutError) as error:
+        raise RuntimeError(f"Gemini request failed: {error}") from error
+
+
+def available_model(api_key: str) -> str:
+    models = api_request(api_key, "models").get("models", [])
+    candidates = [
+        model for model in models
+        if "generateContent" in model.get("supportedGenerationMethods", [])
+        and "flash" in model.get("name", "").casefold()
+    ]
+    if not candidates:
+        raise RuntimeError("Gemini API returned no available flash generation model")
+    candidates.sort(key=lambda model: ("lite" not in model["name"].casefold(), model["name"]))
+    return candidates[0]["name"].removeprefix("models/")
 
 
 def request_proverb(seen_latin: list[str]) -> dict[str, str]:
@@ -40,8 +67,9 @@ Markdown, commentary, or extra keys."""
             "temperature": 0.8,
         },
     }
+    model = available_model(api_key)
     url = (
-        f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:"
+        f"https://generativelanguage.googleapis.com/v1beta/models/{model}:"
         f"generateContent?key={urllib.parse.quote(api_key)}"
     )
     request = urllib.request.Request(
