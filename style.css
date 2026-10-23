@@ -108,6 +108,14 @@ body {
   line-height: 1.5;
 }
 
+@media (max-width: 600px) {
+  .feedback-tab {
+    top: auto;
+    right: 1rem;
+    bottom: 1rem;
+  }
+}
+
 .card {
   box-sizing: border-box;
   width: min(680px, calc(100% - 2rem));
