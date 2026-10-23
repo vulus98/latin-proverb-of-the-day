@@ -1,8 +1,8 @@
 {
   "date": "Friday, 23 October 2026",
-  "latin": "Sic transit gloria mundi",
-  "translation": "Thus passes the glory of the world",
-  "meaning": "Worldly ambitions, fame, and temporal power are fleeting and ultimately insignificant.",
-  "anecdote": "This phrase was historically used in the coronation ritual of the Pope. As the newly elected pontiff processed toward St. Peter's Basilica, a master of ceremonies would halt the procession three times, ignite a small piece of tow attached to a reed, and chant the phrase to remind the Pope of his mortality and the transient nature of earthly power.",
-  "prompt": "If all temporal achievements eventually fade into obscurity, what enduring value do our daily pursuits hold?"
+  "latin": "In dubio abstine",
+  "translation": "When in doubt, abstain",
+  "meaning": "When one is unsure about the correct course of action, it is often wiser to do nothing rather than risk a mistake.",
+  "anecdote": "This maxim is a legal principle rooted in Roman law and later adopted into modern jurisprudence and medical ethics. While its exact coinage by a specific historical figure is uncertain, it reflects the prudent caution advocated by Roman jurists and later echoed by philosophers such as Immanuel Kant, who discussed the related principle of moral caution.",
+  "prompt": "When faced with uncertainty, does restraint require more courage than action?"
 }
