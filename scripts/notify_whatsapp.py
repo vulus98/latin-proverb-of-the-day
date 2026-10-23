@@ -12,7 +12,7 @@ REPOSITORY_DATA = (
     "https://raw.githubusercontent.com/vulus98/latin-proverb-of-the-day/main/"
     "data/today.json"
 )
-TARGET = "+381638991909"
+TARGET = "+381605119995"
 STATE = Path.home() / ".local" / "state" / "latin-proverb-of-the-day" / "whatsapp.json"
 OPENCLAW = "/home/vbozic/.local/bin/openclaw"
 GATEWAY = "openclaw-gateway.service"

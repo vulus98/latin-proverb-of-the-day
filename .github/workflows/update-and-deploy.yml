@@ -8,11 +8,6 @@ on:
         required: false
         default: false
         type: boolean
-      send_test:
-        description: "Send the current proverb reminder to my test number"
-        required: false
-        default: false
-        type: boolean
   schedule:
     # Run hourly so the check remains at 09:00 in Europe/Belgrade across DST.
     - cron: "0 * * * *"
