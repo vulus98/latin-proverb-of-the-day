@@ -3,44 +3,20 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="A Latin proverb to learn together every day.">
+    <meta name="description" content="A Latin proverb to learn together.">
     <title>Latin Proverb of the Day</title>
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
-    <button class="feedback-tab" id="feedback-toggle" type="button" aria-expanded="false" aria-controls="feedback-panel">
-      Leave feedback
-    </button>
-    <aside class="feedback-panel" id="feedback-panel" aria-hidden="true">
-      <button class="feedback-close" id="feedback-close" type="button" aria-label="Close feedback">×</button>
-      <p class="eyebrow">A tiny review council</p>
-      <h2>How does the page feel?</h2>
-      <div class="auth-box" id="auth-box">
-        <p id="auth-status">Sign in privately to cast one verdict per day.</p>
-        <form id="auth-form">
-          <label for="auth-email">Your email</label>
-          <input id="auth-email" type="email" autocomplete="email" required>
-          <button type="submit">Send me a magic link</button>
-        </form>
-        <button class="sign-out" id="sign-out" type="button" hidden>Sign out</button>
-      </div>
-      <p id="feedback-instruction" hidden>Cast your verdict. The council will answer.</p>
-      <div class="feedback-options" id="feedback-options">
-        <button type="button" data-feedback="delightful"><span aria-hidden="true">✨</span> Surprisingly delightful</button>
-        <button type="button" data-feedback="wise"><span aria-hidden="true">🏛️</span> Wisely curated</button>
-        <button type="button" data-feedback="thoughtful"><span aria-hidden="true">🪶</span> Makes me think</button>
-        <button type="button" data-feedback="cute"><span aria-hidden="true">🌿</span> Cute and clever</button>
-      </div>
-      <button class="honest-feedback" id="honest-feedback" type="button" hidden>Not my thing</button>
-      <div class="feedback-result" id="feedback-result" aria-live="polite" hidden>
-        <p class="feedback-verdict" id="feedback-verdict"></p>
-        <p class="feedback-reply" id="feedback-reply"></p>
-        <button class="feedback-again" id="feedback-again" type="button">Cast another verdict</button>
-      </div>
-    </aside>
+    <div class="laurel laurel-left" aria-hidden="true">❧</div>
+    <div class="laurel laurel-right" aria-hidden="true">❧</div>
     <main class="card">
-      <p class="eyebrow">Latin proverb of the day</p>
-      <p class="date" id="date">Loading…</p>
+      <header class="masthead">
+        <p class="eyebrow">❖  Ad usum vitae  ❖</p>
+        <h1>Latin Proverb<br><em>of the Day</em></h1>
+        <p class="date" id="date">Loading…</p>
+      </header>
+      <div class="divider" aria-hidden="true"><span>✦</span></div>
       <blockquote>
         <p class="latin" id="latin">Loading…</p>
         <p class="translation" id="translation"></p>
@@ -54,14 +30,31 @@
         <h2 id="reflection-title">Question to ponder</h2>
         <p class="prompt" id="prompt"></p>
       </section>
+      <footer class="footer">✦  Shared between two curious minds  ✦</footer>
     </main>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase-config.js"></script>
+
+    <button class="feedback-tab" id="feedback-toggle" type="button" aria-expanded="false" aria-controls="feedback-panel">
+      Leave a verdict
+    </button>
+    <aside class="feedback-panel" id="feedback-panel" aria-hidden="true">
+      <button class="feedback-close" id="feedback-close" type="button" aria-label="Close feedback">×</button>
+      <p class="eyebrow">The tiny Roman council</p>
+      <h2>How does the page feel?</h2>
+      <p class="feedback-intro">Choose your verdict. The council has prepared a reply.</p>
+      <div class="feedback-options" id="feedback-options">
+        <button type="button" data-feedback="delightful"><span aria-hidden="true">✨</span> Surprisingly delightful</button>
+        <button type="button" data-feedback="wise"><span aria-hidden="true">🏛️</span> Wisely curated</button>
+        <button type="button" data-feedback="thoughtful"><span aria-hidden="true">🪶</span> Makes me think</button>
+        <button type="button" data-feedback="cute"><span aria-hidden="true">🌿</span> Cute and clever</button>
+      </div>
+      <button class="honest-feedback" type="button" data-feedback="honest">Not my thing</button>
+      <div class="feedback-result" id="feedback-result" aria-live="polite" hidden>
+        <p class="feedback-verdict" id="feedback-verdict"></p>
+        <p class="feedback-reply" id="feedback-reply"></p>
+        <button class="feedback-again" id="feedback-again" type="button">Cast another verdict</button>
+      </div>
+    </aside>
     <script>
-      const supabaseConfig = window.LATIN_PROVERB_SUPABASE;
-      const supabaseClient = supabaseConfig?.url && supabaseConfig?.anonKey
-        ? window.supabase.createClient(supabaseConfig.url, supabaseConfig.anonKey)
-        : null;
       let currentProverb = null;
       fetch("data/today.json", { cache: "no-store" })
         .then((response) => {
@@ -83,214 +76,81 @@
           console.error(error);
         });
 
-        const feedbackToggle = document.getElementById("feedback-toggle");
-        const feedbackClose = document.getElementById("feedback-close");
-        const feedbackPanel = document.getElementById("feedback-panel");
-        const feedbackOptions = document.getElementById("feedback-options");
-        const honestFeedback = document.getElementById("honest-feedback");
-        const feedbackResult = document.getElementById("feedback-result");
-        const feedbackVerdict = document.getElementById("feedback-verdict");
-        const feedbackReply = document.getElementById("feedback-reply");
-        const feedbackInstruction = document.getElementById("feedback-instruction");
-        const authStatus = document.getElementById("auth-status");
-        const authForm = document.getElementById("auth-form");
-        const authEmail = document.getElementById("auth-email");
-        const signOut = document.getElementById("sign-out");
-        const feedbackButtons = [...document.querySelectorAll("#feedback-options button"), honestFeedback];
-        const setFeedbackOpen = (isOpen) => {
-          feedbackToggle.setAttribute("aria-expanded", String(isOpen));
-          feedbackPanel.setAttribute("aria-hidden", String(!isOpen));
-          feedbackPanel.classList.toggle("is-open", isOpen);
-          if (isOpen) feedbackPanel.querySelector("button").focus();
-        };
+      const feedbackToggle = document.getElementById("feedback-toggle");
+      const feedbackClose = document.getElementById("feedback-close");
+      const feedbackPanel = document.getElementById("feedback-panel");
+      const feedbackOptions = document.getElementById("feedback-options");
+      const honestFeedback = document.querySelector(".honest-feedback");
+      const feedbackResult = document.getElementById("feedback-result");
+      const feedbackVerdict = document.getElementById("feedback-verdict");
+      const feedbackReply = document.getElementById("feedback-reply");
+      const setFeedbackOpen = (isOpen) => {
+        feedbackToggle.setAttribute("aria-expanded", String(isOpen));
+        feedbackPanel.setAttribute("aria-hidden", String(!isOpen));
+        feedbackPanel.classList.toggle("is-open", isOpen);
+        if (isOpen) feedbackPanel.querySelector("button").focus();
+      };
+      feedbackToggle.addEventListener("click", () => setFeedbackOpen(true));
+      feedbackClose.addEventListener("click", () => setFeedbackOpen(false));
 
-        feedbackToggle.addEventListener("click", () => setFeedbackOpen(true));
-        feedbackClose.addEventListener("click", () => setFeedbackOpen(false));
-        const showReply = (label, replies, choice) => {
-          feedbackVerdict.textContent = `The council hears: “${label}”`;
-          const response = replies[Math.floor(Math.random() * replies.length)];
-          feedbackReply.textContent = response;
-          submitFeedback(choice, response);
-          feedbackOptions.hidden = true;
-          honestFeedback.hidden = true;
-          feedbackResult.hidden = false;
-          feedbackResult.classList.remove("feedback-result-pop");
-          void feedbackResult.offsetWidth;
-          feedbackResult.classList.add("feedback-result-pop");
-        };
-        const submitFeedback = async (choice, response) => {
-          if (!supabaseClient || !currentProverb) return;
-          const { data: { user } } = await supabaseClient.auth.getUser();
-          if (!user) return;
-          const { error } = await supabaseClient.from("feedback").insert({
-            user_id: user.id,
-            choice,
-            response,
-            proverb_date: currentProverb.date,
-            proverb_latin: currentProverb.latin
-          });
-          if (error) {
-            feedbackReply.textContent = error.code === "23505"
-              ? "Your one verdict for today is already in the archive."
-              : "The council could not record that verdict. Please try again later.";
-          }
-        };
-        const updateAuthUi = async (user) => {
-          const signedIn = Boolean(user);
-          authForm.hidden = signedIn;
-          signOut.hidden = !signedIn;
-          feedbackInstruction.hidden = !signedIn;
-          feedbackButtons.forEach((button) => { button.hidden = !signedIn; });
-          authStatus.textContent = signedIn
-            ? `Signed in as ${user.email}. One verdict per day.`
-            : "Sign in privately to cast one verdict per day.";
-        };
-        authForm.addEventListener("submit", async (event) => {
-          event.preventDefault();
-          if (!supabaseClient) {
-            authStatus.textContent = "Private feedback is not configured yet.";
-            return;
-          }
-          const { error } = await supabaseClient.auth.signInWithOtp({
-            email: authEmail.value.trim(),
-            options: { emailRedirectTo: window.location.href }
-          });
-          authStatus.textContent = error ? error.message : "Check your email for the private magic link.";
-        });
-        signOut.addEventListener("click", () => supabaseClient?.auth.signOut());
-        if (supabaseClient) {
-          supabaseClient.auth.getSession().then(({ data: { session } }) => updateAuthUi(session?.user));
-          supabaseClient.auth.onAuthStateChange((_event, session) => updateAuthUi(session?.user));
-        } else {
-          updateAuthUi(null);
-        }
-        const resetFeedback = () => {
-          feedbackOptions.hidden = false;
-          honestFeedback.hidden = false;
-          feedbackResult.hidden = true;
-        };
-        const feedbackReplies = {
-          delightful: [
-            "Excellent taste. Clearly, your standards are flourishing.",
-            "A delightful verdict from a delightful person.",
-            "Your joy has been carefully noted by the tiny review council.",
-            "We knew the Latin would win you over eventually.",
-            "That is almost as lovely as you are.",
-            "Your smile just earned honorary Roman citizenship.",
-            "A glowing review! The parchment is already being prepared.",
-            "You have excellent instincts and suspiciously good taste.",
-            "This page is blushing. You may have to give it a moment.",
-            "Your approval has made the ancient scrolls sparkle.",
-            "Delight detected. We recommend celebrating with a small snack.",
-            "The proverb has officially found its favorite reader.",
-            "Your enthusiasm is more radiant than a freshly polished laurel wreath.",
-            "This is the sort of feedback that makes websites stand taller.",
-            "A charming opinion from an even more charming critic.",
-            "The muses have reviewed your review and given it five stars.",
-            "You have made a humble webpage feel extremely fancy.",
-            "That compliment has been framed and hung in the virtual hallway.",
-            "Your excellent taste remains undefeated.",
-            "The page would like to thank you personally, but it has no hands."
-          ],
-          wise: [
-            "A wise choice. The ancient Romans would have applauded politely.",
-            "Your judgment is sound. Seneca would probably nod.",
-            "Wisdom recognized wisdom. Very efficient.",
-            "You have chosen with the confidence of a philosopher-king.",
-            "That was a discerning click, worthy of its own footnote.",
-            "Your inner sage is clearly having a productive morning.",
-            "The Oracle of Delphi has been informed of your excellent judgment.",
-            "A thoughtful verdict from someone who clearly reads beyond the headline.",
-            "You clicked wisely, which is more than most emperors managed.",
-            "Your discernment has been entered into the public record.",
-            "That choice has the quiet dignity of a well-placed semicolon.",
-            "The council agrees: your judgment is remarkably well seasoned.",
-            "You have selected the option with maximum philosophical credibility.",
-            "A wise response. Somewhere, a toga has been adjusted approvingly.",
-            "Your standards are high, your judgment is higher.",
-            "This decision would pass even the strictest Roman jury.",
-            "You have the rare gift of recognizing quality without making a speech.",
-            "Prudent, elegant, and entirely correct. Naturally.",
-            "A sound decision, made by a sound mind.",
-            "Your wisdom has briefly improved the average intelligence of the internet."
-          ],
-          thoughtful: [
-            "Your enthusiasm has been added to today's historical record.",
-            "A thoughtful reader! The proverb has found fertile ground.",
-            "You have given the question exactly the attention it was hoping for.",
-            "Your mind is clearly wandering in interesting directions.",
-            "That is the click of someone who notices the small things.",
-            "The philosophers approve of your excellent use of curiosity.",
-            "You have turned a tiny proverb into a proper conversation.",
-            "Your reflection has made this webpage feel unexpectedly profound.",
-            "A beautiful choice from someone with a beautifully busy mind.",
-            "The question is now wearing a little thinking cap.",
-            "You have given the ancient words a modern audience and a good one.",
-            "Your curiosity is doing excellent work today.",
-            "That answer suggests there is a whole essay hiding in your head.",
-            "The page is pleased to have provoked a thought rather than a yawn.",
-            "You are proof that old words can still find new minds.",
-            "A reflective click. Plato would have asked a follow-up question.",
-            "Your attention has made the proverb feel important again.",
-            "The thoughtfulness here is frankly showing off.",
-            "You have found the question inside the question. Very impressive.",
-            "A deep thinker has entered the feedback panel. Everyone remain calm."
-          ],
-          cute: [
-            "A compliment from you? We shall treasure it forever.",
-            "Cute and clever recognizes cute and clever.",
-            "That is an adorable assessment from an adorable scholar.",
-            "The page has just developed a tiny crush on your feedback.",
-            "You make even ancient Latin feel warm and cozy.",
-            "The Roman doves have delivered your compliment safely.",
-            "That was sweet. The scrolls are blushing.",
-            "A charming click from a charming person. Statistically inevitable.",
-            "Your feedback is cuter than a kitten in a tiny laurel wreath.",
-            "The page would send you flowers, if CSS had a florist.",
-            "That compliment has been wrapped in ribbon and stored carefully.",
-            "You are making classical education dangerously adorable.",
-            "A lovely choice from our favorite modern Roman.",
-            "The feedback panel has officially become the cutest part of the site.",
-            "You brought a little sunshine to a page full of old words.",
-            "That was so sweet, even the sternest Latin teacher smiled.",
-            "Your charm has been noted in elegant handwriting.",
-            "A precious review from a precious reader.",
-            "The page is now fluffing its metaphorical feathers.",
-            "You have made this tiny corner of the internet very happy."
-          ]
-        };
-        const honestReplies = [
-          "Fair enough. Even Cicero had critics.",
-          "Not every proverb can be your proverb. The search continues.",
-          "A respectable verdict. The page will reflect on it dramatically.",
-          "Thank you for the honest review. No scrolls were harmed.",
-          "Understood. We shall put this proverb in the reconsideration pile.",
-          "The ancient review council accepts your ruling.",
-          "That is fair. Even the Romans did not agree on everything.",
-          "Noted with dignity, humility, and a tiny ceremonial bow.",
-          "Your honesty has been received and carefully filed under ‘useful.’",
-          "No offense taken. The page has a surprisingly resilient ego.",
-          "A wise website listens to its readers. This one is listening.",
-          "Perhaps a different proverb will win you over tomorrow.",
-          "The muses have requested more specific feedback, but they understand.",
-          "A perfectly valid opinion. Your standards remain safely intact.",
-          "The page will now stare thoughtfully out of an imaginary window.",
-          "Thank you for sparing us a five-paragraph diplomatic complaint.",
-          "Even the best ideas occasionally meet a raised eyebrow.",
-          "Your verdict is entered into the annals of honest criticism.",
-          "We shall regroup, consult the classics, and try again.",
-          "Fair enough. The next proverb has been warned."
-        ];
-        document.querySelectorAll("#feedback-options button").forEach((option) => {
-          option.addEventListener("click", () => {
-            const replies = feedbackReplies[option.dataset.feedback];
-            showReply(option.textContent.trim(), replies, option.dataset.feedback);
-          });
-        });
-        honestFeedback.addEventListener("click", () => {
-          showReply(honestFeedback.textContent, honestReplies, "honest");
-        });
-        document.getElementById("feedback-again").addEventListener("click", resetFeedback);
+      const replies = {
+        delightful: [
+          "The Senate is pleased. Your taste has been entered into the marble record.",
+          "A radiant verdict. Even the laurel leaves are rustling approvingly.",
+          "Excellent. The proverb has found a worthy patron.",
+          "The Muses have sent a thank-you tablet. It is very flattering.",
+          "Your enthusiasm has been awarded a tiny honorary triumph."
+        ],
+        wise: [
+          "A sound judgment. Cicero would have raised one elegant eyebrow.",
+          "Prudent and discerning. The council nods beneath its ceremonial helmets.",
+          "Wisdom recognizes wisdom. The archive has made a respectful bow.",
+          "A verdict fit for a philosopher with excellent sandals.",
+          "Your discernment has been chiselled into an imaginary column."
+        ],
+        thoughtful: [
+          "The proverb has planted a small philosophical seed. Water it occasionally.",
+          "A thoughtful pause in a hurried world. Seneca would approve.",
+          "Your mind has wandered somewhere interesting. Do bring back souvenirs.",
+          "The question has been received by the inner forum.",
+          "A fine choice. The ancient thinkers are now quietly taking notes."
+        ],
+        cute: [
+          "The council declares it charming enough for a very tasteful villa.",
+          "A little green laurel crown has been placed upon your verdict.",
+          "Cute, clever, and properly toga-adjacent.",
+          "The proverb blushed. Fortunately, the marble statues noticed nothing.",
+          "A delightful judgment from the unofficial curator of good things."
+        ],
+        honest: [
+          "Brutal, but fair. The proverb has been sent to reflect on its choices.",
+          "The council accepts your dissent and dramatically consults a scroll.",
+          "Not every maxim can conquer every heart. Even Rome had critics.",
+          "A courageous verdict. The proverb will now stare moodily at the horizon.",
+          "Your honesty has been received with a solemn nod and a small sigh."
+        ]
+      };
+
+      const showReply = (choice, label) => {
+        const choices = replies[choice];
+        feedbackVerdict.textContent = `The council hears: “${label}”`;
+        feedbackReply.textContent = choices[Math.floor(Math.random() * choices.length)];
+        feedbackOptions.hidden = true;
+        honestFeedback.hidden = true;
+        feedbackResult.hidden = false;
+        feedbackResult.classList.remove("feedback-result-pop");
+        void feedbackResult.offsetWidth;
+        feedbackResult.classList.add("feedback-result-pop");
+      };
+
+      document.querySelectorAll("[data-feedback]").forEach((button) => {
+        button.addEventListener("click", () => showReply(button.dataset.feedback, button.textContent.trim()));
+      });
+      document.getElementById("feedback-again").addEventListener("click", () => {
+        feedbackOptions.hidden = false;
+        honestFeedback.hidden = false;
+        feedbackResult.hidden = true;
+      });
     </script>
   </body>
 </html>

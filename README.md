@@ -24,25 +24,6 @@ Cloud API. Install the user units from `systemd/`, then enable
 data every five minutes, sends each proverb only once, and stores its marker in
 `~/.local/state/latin-proverb-of-the-day/whatsapp.json`.
 
-## Private feedback setup
-
-The feedback panel uses Supabase magic-link authentication. Only the two
-addresses in [`supabase/migration.sql`](supabase/migration.sql) can sign in,
-and Supabase enforces one feedback submission per user per day.
-
-1. Create a Supabase project and apply `supabase/migration.sql` in its SQL
-   Editor.
-2. Copy `supabase-config.example.js` to `supabase-config.js` and fill in the
-   project URL and publishable/anon key. This file is ignored by Git.
-3. Add the project URL and **service-role key** to
-   `~/.config/latin-proverb-of-the-day/supabase.env` on the local machine only:
-
-   ```
-   SUPABASE_URL=https://your-project.supabase.co
-   SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-   ```
-
-   Never put the service-role key in the repository or browser config.
-4. Install and enable `latin-proverb-feedback.service` and
-   `latin-proverb-feedback.timer` from `systemd/`. The local notifier sends
-   new feedback to the test WhatsApp number and marks it notified.
+The feedback panel is intentionally public and local to the browser: each
+choice produces a playful, randomized Roman-council reply. Feedback is not
+stored or sent anywhere.
