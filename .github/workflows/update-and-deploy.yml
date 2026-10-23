@@ -2,6 +2,12 @@ name: Update and deploy
 
 on:
   workflow_dispatch:
+    inputs:
+      generate:
+        description: "Generate a new proverb with Gemini before deploying"
+        required: false
+        default: false
+        type: boolean
   schedule:
     # Run hourly so the check remains at 09:00 in Europe/Belgrade across DST.
     - cron: "0 * * * *"
@@ -16,13 +22,15 @@ jobs:
       - uses: actions/checkout@v4
       - name: Update at 09:00 Europe/Belgrade
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$(TZ=Europe/Belgrade date +%H)" = "09" ]; then
+          if [ "${{ github.event_name }}" = "schedule" ] && [ "$(TZ=Europe/Belgrade date +%H)" != "09" ]; then
+            echo "Not 09:00 Europe/Belgrade; no update needed."
+          else
             max_attempts=1
-            if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            if [ "${{ inputs.generate }}" = "true" ]; then
               max_attempts=72
             fi
             for attempt in $(seq 1 "$max_attempts"); do
-              if GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}" FORCE_GENERATE="${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}" python scripts/update_proverb.py; then
+              if GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}" FORCE_GENERATE="${{ inputs.generate == true && '1' || '0' }}" python scripts/update_proverb.py; then
                 git config user.name "github-actions[bot]"
                 git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
                 git add data/today.json data/seen.json
@@ -37,8 +45,6 @@ jobs:
                 echo "::warning::Gemini generation failed after ${max_attempts} attempts; keeping the previous proverb."
               fi
             done
-          else
-            echo "Not 09:00 Europe/Belgrade; no update needed."
           fi
       - name: Configure Pages
         uses: actions/configure-pages@v5
