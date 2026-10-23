@@ -21,9 +21,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Update at 09:00 Europe/Belgrade
+        id: publish
         run: |
-          if [ "${{ github.event_name }}" = "schedule" ] && [ "$(TZ=Europe/Belgrade date +%H)" != "09" ]; then
-            echo "Not 09:00 Europe/Belgrade; no update needed."
+          if [ "${{ github.event_name }}" = "schedule" ] && { [ "$(TZ=Europe/Belgrade date +%u)" != "2" ] && [ "$(TZ=Europe/Belgrade date +%u)" != "6" ]; || [ "$(TZ=Europe/Belgrade date +%H)" != "09" ]; }; then
+            echo "Not Tuesday or Saturday at 09:00 Europe/Belgrade; no update needed."
+            echo "updated=false" >> "$GITHUB_OUTPUT"
           else
             should_generate=false
             if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.generate }}" = "true" ]; then
@@ -41,6 +43,7 @@ jobs:
                   git add data/today.json data/seen.json
                   git diff --cached --quiet || git commit -m "Update proverb of the day"
                   git push
+                  echo "updated=true" >> "$GITHUB_OUTPUT"
                   break
                 elif [ "$status" -ne 75 ]; then
                   echo "::error::Gemini failed with a non-retryable error; stopping so it can be fixed."
@@ -54,8 +57,48 @@ jobs:
               done
             else
               echo "Manual deployment requested without Gemini generation."
+              echo "updated=false" >> "$GITHUB_OUTPUT"
             fi
           fi
+      - name: Send WhatsApp reminder
+        if: steps.publish.outputs.updated == 'true' && github.event_name == 'schedule'
+        env:
+          WHATSAPP_PHONE_NUMBER_ID: ${{ secrets.WHATSAPP_PHONE_NUMBER_ID }}
+          WHATSAPP_ACCESS_TOKEN: ${{ secrets.WHATSAPP_ACCESS_TOKEN }}
+        run: |
+          teaser="$(python - <<'PY'
+          import json
+          meaning = json.load(open("data/today.json", encoding="utf-8"))["meaning"]
+          print(meaning[:140].rstrip(" .") + ("…" if len(meaning) > 140 else ""))
+          PY
+          )"
+          link="https://vulus98.github.io/latin-proverb-of-the-day/"
+          payload="$(python - "$teaser" "$link" <<'PY'
+          import json
+          import sys
+          print(json.dumps({
+              "messaging_product": "whatsapp",
+              "to": "+381605119995",
+              "type": "template",
+              "template": {
+                  "name": "latin_proverb_update",
+                  "language": {"code": "en_US"},
+                  "components": [{
+                      "type": "body",
+                      "parameters": [
+                          {"type": "text", "text": sys.argv[1]},
+                          {"type": "text", "text": sys.argv[2]}
+                      ]
+                  }]
+              }
+          }))
+          PY
+          )"
+          curl --fail-with-body --silent --show-error --max-time 30 \
+            -X POST "https://graph.facebook.com/v22.0/${WHATSAPP_PHONE_NUMBER_ID}/messages" \
+            -H "Authorization: Bearer ${WHATSAPP_ACCESS_TOKEN}" \
+            -H "Content-Type: application/json" \
+            --data "$payload"
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload Pages artifact
