@@ -21,7 +21,7 @@ class RetryableGeminiError(RuntimeError):
     """A temporary Gemini or network failure that is safe to retry."""
 
 
-class UnavailableGeminiModelError(RetryableGeminiError):
+class UnavailableGeminiModelError(RuntimeError):
     """A listed model cannot be used and should be replaced."""
 
 
@@ -63,7 +63,12 @@ def available_models(api_key: str) -> list[str]:
         return (-version, "lite" in name, name)
 
     candidates.sort(key=model_priority)
-    return [model["name"].removeprefix("models/") for model in candidates]
+    names = [model["name"].removeprefix("models/") for model in candidates]
+    preferred = "gemini-3.5-flash-lite"
+    if preferred in names:
+        names.remove(preferred)
+        names.insert(0, preferred)
+    return names
 
 
 def request_proverb(seen_latin: list[str]) -> dict[str, str]:
