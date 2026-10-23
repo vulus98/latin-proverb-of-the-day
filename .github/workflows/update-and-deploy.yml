@@ -75,6 +75,21 @@ jobs:
           fi
       - name: Configure Pages
         uses: actions/configure-pages@v5
+      - name: Configure Supabase browser client
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "::error::SUPABASE_URL and SUPABASE_ANON_KEY repository secrets are required."
+            exit 1
+          fi
+          cat > supabase-config.js <<EOF
+          window.LATIN_PROVERB_SUPABASE = {
+            url: "$SUPABASE_URL",
+            anonKey: "$SUPABASE_ANON_KEY"
+          };
+          EOF
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
