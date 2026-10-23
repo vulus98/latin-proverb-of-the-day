@@ -15,14 +15,23 @@
       <button class="feedback-close" id="feedback-close" type="button" aria-label="Close feedback">×</button>
       <p class="eyebrow">A tiny review council</p>
       <h2>How does the page feel?</h2>
-      <p>Cast your verdict. The council will answer.</p>
+      <div class="auth-box" id="auth-box">
+        <p id="auth-status">Sign in privately to cast one verdict per day.</p>
+        <form id="auth-form">
+          <label for="auth-email">Your email</label>
+          <input id="auth-email" type="email" autocomplete="email" required>
+          <button type="submit">Send me a magic link</button>
+        </form>
+        <button class="sign-out" id="sign-out" type="button" hidden>Sign out</button>
+      </div>
+      <p id="feedback-instruction" hidden>Cast your verdict. The council will answer.</p>
       <div class="feedback-options" id="feedback-options">
         <button type="button" data-feedback="delightful"><span aria-hidden="true">✨</span> Surprisingly delightful</button>
         <button type="button" data-feedback="wise"><span aria-hidden="true">🏛️</span> Wisely curated</button>
         <button type="button" data-feedback="thoughtful"><span aria-hidden="true">🪶</span> Makes me think</button>
         <button type="button" data-feedback="cute"><span aria-hidden="true">🌿</span> Cute and clever</button>
       </div>
-      <button class="honest-feedback" id="honest-feedback" type="button">Not my thing</button>
+      <button class="honest-feedback" id="honest-feedback" type="button" hidden>Not my thing</button>
       <div class="feedback-result" id="feedback-result" aria-live="polite" hidden>
         <p class="feedback-verdict" id="feedback-verdict"></p>
         <p class="feedback-reply" id="feedback-reply"></p>
@@ -46,13 +55,21 @@
         <p class="prompt" id="prompt"></p>
       </section>
     </main>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
     <script>
+      const supabaseConfig = window.LATIN_PROVERB_SUPABASE;
+      const supabaseClient = supabaseConfig?.url && supabaseConfig?.anonKey
+        ? window.supabase.createClient(supabaseConfig.url, supabaseConfig.anonKey)
+        : null;
+      let currentProverb = null;
       fetch("data/today.json", { cache: "no-store" })
         .then((response) => {
           if (!response.ok) throw new Error("Could not load today's proverb");
           return response.json();
         })
         .then((proverb) => {
+          currentProverb = proverb;
           document.getElementById("date").textContent = proverb.date;
           document.getElementById("latin").textContent = proverb.latin;
           document.getElementById("translation").textContent = proverb.translation;
@@ -74,6 +91,12 @@
         const feedbackResult = document.getElementById("feedback-result");
         const feedbackVerdict = document.getElementById("feedback-verdict");
         const feedbackReply = document.getElementById("feedback-reply");
+        const feedbackInstruction = document.getElementById("feedback-instruction");
+        const authStatus = document.getElementById("auth-status");
+        const authForm = document.getElementById("auth-form");
+        const authEmail = document.getElementById("auth-email");
+        const signOut = document.getElementById("sign-out");
+        const feedbackButtons = [...document.querySelectorAll("#feedback-options button"), honestFeedback];
         const setFeedbackOpen = (isOpen) => {
           feedbackToggle.setAttribute("aria-expanded", String(isOpen));
           feedbackPanel.setAttribute("aria-hidden", String(!isOpen));
@@ -83,9 +106,11 @@
 
         feedbackToggle.addEventListener("click", () => setFeedbackOpen(true));
         feedbackClose.addEventListener("click", () => setFeedbackOpen(false));
-        const showReply = (label, replies) => {
+        const showReply = (label, replies, choice) => {
           feedbackVerdict.textContent = `The council hears: “${label}”`;
-          feedbackReply.textContent = replies[Math.floor(Math.random() * replies.length)];
+          const response = replies[Math.floor(Math.random() * replies.length)];
+          feedbackReply.textContent = response;
+          submitFeedback(choice, response);
           feedbackOptions.hidden = true;
           honestFeedback.hidden = true;
           feedbackResult.hidden = false;
@@ -93,6 +118,52 @@
           void feedbackResult.offsetWidth;
           feedbackResult.classList.add("feedback-result-pop");
         };
+        const submitFeedback = async (choice, response) => {
+          if (!supabaseClient || !currentProverb) return;
+          const { data: { user } } = await supabaseClient.auth.getUser();
+          if (!user) return;
+          const { error } = await supabaseClient.from("feedback").insert({
+            user_id: user.id,
+            choice,
+            response,
+            proverb_date: currentProverb.date,
+            proverb_latin: currentProverb.latin
+          });
+          if (error) {
+            feedbackReply.textContent = error.code === "23505"
+              ? "Your one verdict for today is already in the archive."
+              : "The council could not record that verdict. Please try again later.";
+          }
+        };
+        const updateAuthUi = async (user) => {
+          const signedIn = Boolean(user);
+          authForm.hidden = signedIn;
+          signOut.hidden = !signedIn;
+          feedbackInstruction.hidden = !signedIn;
+          feedbackButtons.forEach((button) => { button.hidden = !signedIn; });
+          authStatus.textContent = signedIn
+            ? `Signed in as ${user.email}. One verdict per day.`
+            : "Sign in privately to cast one verdict per day.";
+        };
+        authForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          if (!supabaseClient) {
+            authStatus.textContent = "Private feedback is not configured yet.";
+            return;
+          }
+          const { error } = await supabaseClient.auth.signInWithOtp({
+            email: authEmail.value.trim(),
+            options: { emailRedirectTo: window.location.href }
+          });
+          authStatus.textContent = error ? error.message : "Check your email for the private magic link.";
+        });
+        signOut.addEventListener("click", () => supabaseClient?.auth.signOut());
+        if (supabaseClient) {
+          supabaseClient.auth.getSession().then(({ data: { session } }) => updateAuthUi(session?.user));
+          supabaseClient.auth.onAuthStateChange((_event, session) => updateAuthUi(session?.user));
+        } else {
+          updateAuthUi(null);
+        }
         const resetFeedback = () => {
           feedbackOptions.hidden = false;
           honestFeedback.hidden = false;
@@ -213,11 +284,11 @@
         document.querySelectorAll("#feedback-options button").forEach((option) => {
           option.addEventListener("click", () => {
             const replies = feedbackReplies[option.dataset.feedback];
-            showReply(option.textContent.trim(), replies);
+            showReply(option.textContent.trim(), replies, option.dataset.feedback);
           });
         });
         honestFeedback.addEventListener("click", () => {
-          showReply(honestFeedback.textContent, honestReplies);
+          showReply(honestFeedback.textContent, honestReplies, "honest");
         });
         document.getElementById("feedback-again").addEventListener("click", resetFeedback);
     </script>

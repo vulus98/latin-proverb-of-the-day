@@ -1,0 +1,9 @@
+[Unit]
+Description=Notify about private Latin proverb feedback via OpenClaw
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=%h/.config/latin-proverb-of-the-day/supabase.env
+ExecStart=/usr/bin/python3 %h/Downloads/latin-proverb-of-the-day/scripts/notify_feedback.py

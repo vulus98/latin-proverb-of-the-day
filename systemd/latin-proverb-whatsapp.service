@@ -1,0 +1,8 @@
+[Unit]
+Description=Send the latest Latin proverb reminder via OpenClaw
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /home/vbozic/Downloads/latin-proverb-of-the-day/scripts/notify_whatsapp.py

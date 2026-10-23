@@ -1,0 +1,11 @@
+[Unit]
+Description=Check for a new Latin proverb reminder
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=5min
+Persistent=true
+Unit=latin-proverb-whatsapp.service
+
+[Install]
+WantedBy=timers.target
