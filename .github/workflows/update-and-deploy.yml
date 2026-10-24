@@ -25,19 +25,24 @@ jobs:
         run: |
           local_day="$(TZ=Europe/Belgrade date +%u)"
           local_hour="$(TZ=Europe/Belgrade date +%H)"
+          local_date="$(TZ=Europe/Belgrade date +%F)"
           schedule_window=false
           if [ "$local_day" = "2" ] || [ "$local_day" = "6" ]; then
-            if [ "$local_hour" = "09" ]; then
+            if [ "$local_hour" -ge 09 ]; then
               schedule_window=true
             fi
           fi
           if [ "${{ github.event_name }}" = "schedule" ] && [ "$schedule_window" = "false" ]; then
-            echo "Not Tuesday or Saturday at 09:00 Europe/Belgrade; no update needed."
+            echo "Not an eligible Tuesday or Saturday update window; no update needed."
             echo "updated=false" >> "$GITHUB_OUTPUT"
           else
             should_generate=false
             if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ inputs.generate }}" = "true" ]; then
               should_generate=true
+            fi
+            if [ "$should_generate" = "true" ] && grep -q "\"date\": \"$local_date\"" data/seen.json; then
+              echo "A proverb is already published for $local_date; no update needed."
+              should_generate=false
             fi
             if [ "$should_generate" = "true" ]; then
               for attempt in $(seq 1 72); do
