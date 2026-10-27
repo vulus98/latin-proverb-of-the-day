@@ -9,8 +9,8 @@ on:
         default: false
         type: boolean
   schedule:
-    # Run hourly so the check remains at 09:00 in Europe/Belgrade across DST.
-    - cron: "0 * * * *"
+    # Check every 15 minutes so a delayed GitHub schedule can recover promptly.
+    - cron: "*/15 * * * *"
 
 permissions:
   contents: write
